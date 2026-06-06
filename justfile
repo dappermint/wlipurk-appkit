@@ -20,7 +20,7 @@ catalog:
 
 # list catalog apps (optionally filter by category: `just list Games`)
 list category='':
-    @python3 {{justfile_directory()}}/scripts/catalog.py list "{{catalog}}" {{category}}
+    @python3 {{justfile_directory()}}/scripts/catalog.py list "{{catalog}}" "{{category}}"
 
 # fetch one app's pinned source into the firmware tree's applications_user/
 fetch appid:
@@ -28,12 +28,13 @@ fetch appid:
     set -euo pipefail
     eval "$(python3 {{justfile_directory()}}/scripts/catalog.py resolve "{{catalog}}" "{{appid}}")"
     cache="/tmp/f6-appkit-cache/$(echo "$ORIGIN@$COMMIT" | tr -c 'A-Za-z0-9' _)"
-    if [ ! -d "$cache/.git" ]; then
+    if [ ! -f "$cache/.ok" ]; then
         rm -rf "$cache"; mkdir -p "$cache"
         git -C "$cache" init -q
         git -C "$cache" remote add origin "$ORIGIN"
         git -C "$cache" fetch --depth 1 -q origin "$COMMIT" || git -C "$cache" fetch -q origin
         git -C "$cache" -c advice.detachedHead=false checkout -q "$COMMIT"
+        touch "$cache/.ok"
     fi
     src="$cache/${SUBDIR}"
     [ -f "$src/application.fam" ] || { echo "no application.fam at $src"; exit 1; }

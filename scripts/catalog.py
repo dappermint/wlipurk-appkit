@@ -7,6 +7,7 @@ Usage:
 """
 import os
 import re
+import shlex
 import sys
 
 
@@ -41,10 +42,10 @@ def resolve(catalog, appid):
     subdir = field(blk, "subdir")
     if not origin or not commit:
         sys.exit(f"'{appid}' manifest missing origin/commit_sha (non-git source?)")
-    print(f"CATEGORY={cat}")
-    print(f"ORIGIN={origin}")
-    print(f"COMMIT={commit}")
-    print(f"SUBDIR={subdir}")
+    print(f"CATEGORY={shlex.quote(cat)}")
+    print(f"ORIGIN={shlex.quote(origin)}")
+    print(f"COMMIT={shlex.quote(commit)}")
+    print(f"SUBDIR={shlex.quote(subdir)}")
 
 
 def list_apps(catalog, category=None):
